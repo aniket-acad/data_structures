@@ -21,11 +21,6 @@ void create();
 /**
  * 
  * */
-void destroy();
-
-/**
- * 
- * */
 status push(int);
 
 /**
@@ -37,4 +32,9 @@ status pop(int*);
  * 
  * */
 status peek(int*);
+
+/**
+ * 
+ * */
+void printStack();
 
