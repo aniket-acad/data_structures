@@ -1,10 +1,12 @@
 #include "stack.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 // forward declaration
 unsigned long size();
 status isEmpty();
 status isFull();
+void destroy();
 
 
 int* elementsStack = NULL;
@@ -18,8 +20,10 @@ void create(){
 }
 
 void destroy(){
-    if(NULL != elementsStack)
+    if(NULL != elementsStack){
         free(elementsStack);
+        elementsStack = NULL;
+    }
     return;
 }
 
@@ -66,4 +70,15 @@ status isFull(){
         return STACK_TRUE;
 
     return STACK_FALSE;
+}
+
+void printStack(){
+    if(STACK_TRUE == isEmpty())
+        return;
+
+    printf("++++++++++++\n");
+    for(short i=topOfStack; i > -1; i--){
+        printf("Element %d: %d\n", i, elementsStack[i]);
+    }
+    printf("-----------\n");
 }
