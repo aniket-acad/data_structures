@@ -73,6 +73,96 @@ status_t isDataPresent(nodeQ_t* ptr, short data){
     return LIST_FALSE;
 }
 
+status_t insertNode(nodeQ_t* head, nodeQ_t* newNode, unsigned short index){
+    if(EMPTYNODE == head || EMPTYNODE == newNode) return LIST_FALSE;
+
+    if(0 == index) return prependNode(head, newNode);  
+
+    nodeQ_t* curr = head;
+
+    unsigned short counter = 0;
+    while(curr){
+        counter++;
+        if(index == counter){
+            // 56
+            // 14 -> 16 -> 17
+            newNode->next = curr->next;
+            // 56 ->16
+            curr->next = newNode;
+            // 14->56->16>17
+            return LIST_TRUE;
+        }
+        curr = curr->next;
+    }
+
+    return LIST_FALSE;
+}
+
+status_t removeNode(nodeQ_t* head, nodeQ_t** newHead, unsigned short index){
+    if(EMPTYNODE == head) return LIST_FALSE;
+
+    if(0 == index){
+        *newHead = head->next;
+        free(head);
+        return LIST_TRUE;
+    }
+
+    nodeQ_t* prev = head;
+    nodeQ_t* curr = head->next;
+
+    // 15 -> EMPTYNODE
+    unsigned short counter = 0;
+    while(curr){
+        counter++;
+        if(index == counter){
+            
+            // 15 = prev
+            // 16 = curr
+            // 17 = curr->next
+            prev->next = curr->next;
+            free(curr);
+            return LIST_TRUE;
+        }
+
+        // 15->16->17->18
+        // 16 = prev
+        // curr = 17
+        prev = curr;
+        curr = curr->next;
+    }
+    return LIST_FALSE;
+}
+
+nodeQ_t* reverseList(nodeQ_t* head){
+    if(EMPTYNODE == head) return EMPTYNODE;
+
+    nodeQ_t* prev = head;
+    nodeQ_t* tmp = EMPTYNODE;
+    nodeQ_t* curr = head->next;
+    head->next = EMPTYNODE;
+
+    while(curr){
+        // 15 -> 16 -> 17 -> 18 -> 19
+        // store curr->next into a tmp variable
+        tmp = curr->next;
+        // tmp = 17
+
+        // update next for the curr node
+        curr->next = prev;
+        // curr = 16
+        // curr->next = 15
+         // 15 <- 16 <- 17 ??? 18 -> 19
+         
+        prev = curr;
+        // prev = 16
+        curr = tmp;
+        // curr = 17
+    }
+
+    return prev;
+}
+
+
 int main(){
     
     nodeQ_t* head = EMPTYNODE;
@@ -102,9 +192,36 @@ int main(){
     printf("%d\t\t%p\t\t%p\n", tail->data, tail, tail->next);
     #endif
 
-    //printList(head);
+    printList(head);
 
-    printf("dataPresent = %d \n", isDataPresent(head, 225));
+    if(LIST_TRUE == insertNode(head, createNode(100), 5)){
+        printList(head);
+    }
+
+    if(LIST_TRUE == insertNode(head, createNode(101), 10)){
+        printList(head);
+    }
+
+    if(LIST_TRUE == insertNode(head, createNode(450),20)){
+        printList(head);
+    }
+
+    if(LIST_TRUE == removeNode(head, &head, 8)){
+        printList(head);
+    }
+
+    if(LIST_TRUE == removeNode(head, &head, 0)){
+        printList(head);
+    }
+
+    if(LIST_TRUE == removeNode(head, &head, 800)){
+        printList(head);
+    }
+
+    head = reverseList(head);
+    printList(head);
+
+    //printf("dataPresent = %d \n", isDataPresent(head, 225));
 
     //destroyList(head);
     //head = EMPTYNODE;
