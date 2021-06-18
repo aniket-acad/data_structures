@@ -12,14 +12,14 @@ struct node {
 	struct node* right;
 };
 
-typedef struct node node_t;
+typedef struct node nodeQ_t;
 
 short trackerArr[2048] = {0};
 short trackerIdx = 0;
 
-node_t* createNode(short data)
+nodeQ_t* createNode(short data)
 {
-	node_t* node = (node_t*)malloc(sizeof(node_t));
+	nodeQ_t* node = (nodeQ_t*)malloc(sizeof(nodeQ_t));
 	node->data = data;
 
 	node->left = EMPTYNODE;
@@ -27,7 +27,7 @@ node_t* createNode(short data)
 	return node;
 }
 
-void printTree(node_t* root, short space)
+void printTree(nodeQ_t* root, short space)
 {
     if (root == NULL)
         return;
@@ -44,26 +44,26 @@ void printTree(node_t* root, short space)
     printTree(root->left, space);
 }
 
-short isPresentOnPath(node_t* root, short val)
+short isPresentOnPath(nodeQ_t* node, short val)
 {
-    if (!root)
+    if (!node) // EMPTYNODE == node
         return FALSE;
       
-    trackerArr[trackerIdx] = root->data;  
-    trackerIdx++;  
+    trackerArr[trackerIdx] = node->data;  
+    trackerIdx++; // push()
       
-    if (root->data == val)    
+    if (node->data == val)    
         return TRUE;
       
-    if (isPresentOnPath(root->left, val) ||
-        isPresentOnPath(root->right, val))
+    if (isPresentOnPath(node->left, val) ||
+        isPresentOnPath(node->right, val))
         return TRUE;
       
-    trackerIdx--; 
+    trackerIdx--; // pop()
     return FALSE;            
 }
   
-void printPath(node_t* root, short val)
+void printPath(nodeQ_t* root, short val)
 {
     if (isPresentOnPath(root, val))
     {
@@ -77,21 +77,37 @@ void printPath(node_t* root, short val)
         printf("Value not present on path\n");
 }
 
-struct node* insert(struct node* node, int key)
-{
-    /* If the tree is empty, return a new node */
-    if (node == NULL)
-        return newNode(key);
- 
-    /* Otherwise, recur down the tree */
-    if (key < node->key)
-        node->left = insert(node->left, key);
-    else if (key > node->key)
-        node->right = insert(node->right, key);
- 
-    /* return the (unchanged) node pointer */
-    return node;
+
+void printInorder(nodeQ_t* node){
+    if(!node) 
+        return;
+
+    printInorder(node->left); // left
+    printf("%d -> ", node->data); // root
+    printInorder(node->right); // right
+
 }
+
+void printPreorder(nodeQ_t* node){
+    if(!node) 
+        return;
+
+    printf("%d -> ", node->data); // root
+    printPreorder(node->left); // left
+    printPreorder(node->right); // right
+
+}
+
+void printPostorder(nodeQ_t* node){
+    if(!node) 
+        return;
+
+    printPostorder(node->left); // left
+    printPostorder(node->right); // right
+    printf("%d -> ", node->data); // root
+
+}
+
 
 
 int main()
@@ -102,37 +118,49 @@ int main()
 	root->left = createNode(22);
 	root->right = createNode(33);
 	
-	root->left->left = createNode(44);
+	root->left->left = createNode(144);
     root->left->right = createNode(55);
 
     root->right->left = createNode(66);
-    root->right->right = createNode(77);
+    root->right->right = createNode(222);
 
     root->right->left->left = createNode(88);
     root->right->right->right = createNode(99);
 
     root->right->left->left = createNode(111);
-    root->right->right->right = createNode(222);
+    root->right->right->right = createNode(77);
 
-    printf("%d\n", root->data);
+    root->left->left->left = createNode(-45);
+    root->left->right->right = createNode(-9);
+
+    /*printf("%d\n", root->data);
     printf("%d\n", root->left->data);
     printf("%d\n", root->right->data);
     printf("%d\n", root->left->left->data);
     printf("%d\n", root->left->right->data);
     printf("%d\n", root->right->left->data);
-    printf("%d\n", root->right->right->data);
+    printf("%d\n", root->right->right->data);*/
 
     printTree(root, 0);
 
-    trackerIdx = 0;
+    /*trackerIdx = 0;
     printPath(root, 55);
     trackerIdx = 0;
     printPath(root, 56);
     trackerIdx = 0;
     printPath(root, 77);
     trackerIdx = 0;
-    printPath(root, 222);
+    printPath(root, 222);*/
 
+    printf("Inorder: ");
+    printInorder(root);
+    printf("\n");
+    printf("Preorder: ");
+    printPreorder(root);
+    printf("\n");
+    printf("Postorder: ");
+    printPostorder(root);
+    printf("\n");
 	
 	return 0;
 }
