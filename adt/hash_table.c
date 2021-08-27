@@ -1,75 +1,98 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
-#define SIZE_HTABLE 31
+#define SIZE 255
 
-struct keyval_item{
-    int key;
-    int data; // for sake of simplicity
+struct keyval_item {
+   int data;   
+   int key;
+   struct keyval_item* next;
 };
 
-struct keyval_item* dataBucket[SIZE_HTABLE] = {NULL};
+struct keyval_item* dataBucket[SIZE] = {NULL}; 
 
-int hashFunc(int key){
-    return key % SIZE_HTABLE;
+int hashFunc(int key) {
+   return key % SIZE;
 }
 
-struct keyval_item* lookup(int key){
-    if(key < SIZE_HTABLE)
-        return dataBucket[hashFunc(key)];
+struct keyval_item* search(int key) {
+   //get the hash 
+   int hashIndex = hashFunc(key);  
+   struct keyval_item* head_item = dataBucket[hashIndex]; 
 
-    return NULL;
+   while(NULL != head_item){
+      if(head_item->key == key){
+         return head_item;
+      }
+      head_item = head_item->next;
+   }
+
+   return NULL;
 }
 
-void delete(int key){
-    return;
+void insert(int key,int data) {
+   struct keyval_item *item = (struct keyval_item*) malloc(sizeof(struct keyval_item));
+   item->data = data;  
+   item->key = key;
+
+   //get the hash 
+   int hashIndex = hashFunc(key);
+   if(NULL != dataBucket[hashIndex]){
+      // insert before the current and create a new head
+      item->next = dataBucket[hashIndex];
+   }  
+   dataBucket[hashIndex] = item;
 }
 
-void insert(struct keyval_item* item){
-    if(NULL == item) return;
-    int idx = hashFunc(item->key);
-    dataBucket[idx] = item;
+void delete(struct keyval_item* item) {
+   int key = item->key;
+
+   //get the hash 
+   int hashIndex = hashFunc(key);
+   free(dataBucket[hashIndex]);
+   dataBucket[hashIndex] = NULL;    
 }
 
-void display(){
-    for(short i =0; i< SIZE_HTABLE; i++){
-        if(NULL != dataBucket[i]){
-            printf("key = %d, data = %d\n", dataBucket[i]->key, dataBucket[i]->data);
-        }
-    }
-    printf("\n");
-    return;
+void display() {
+   int i = 0;
+	
+   for(i = 0; i<SIZE; i++) {
+      if(dataBucket[i] != NULL)
+         printf(" (%d,%d) pair at index = %d\n",dataBucket[i]->key,dataBucket[i]->data, i);
+   }
+	
+   printf("\n");
 }
 
-int main(){
+int main() {
+   
 
-    struct keyval_item item1;
-    item1.key = 3;
-    item1.data = 45;
-    insert(&item1);
+   insert(1, 20);
+   insert(2, 70);
+   insert(42, 80);
+   insert(4, 25);
+   insert(12, 44);
+   insert(14, 32);
+   insert(17, 11);
+   insert(13, 78);
+   insert(37, 97);
 
-    struct keyval_item item2;
-    item2.key = 5;
-    item2.data = 475;
-    insert(&item2);
+   display();
+   struct keyval_item* item = search(37);
 
-    struct keyval_item* retItem = lookup(5);
-    printf("For key = 5, data = %d\n", retItem->data);
-    printf("For key = 3, data = %d\n", lookup(3)->data);
+   if(item != NULL) {
+      printf("Element found: %d\n", item->data);
+   } else {
+      printf("Element not found\n");
+   }
 
-    struct keyval_item item3;
-    item3.key = 56;
-    item3.data = 4765;
-    insert(&item3);
+   delete(item);
+   item = search(37);
 
-    struct keyval_item item4;
-    item4.key = 25;
-    item4.data = 4754;
-    insert(&item4);
-
-    display();
-
-
-
-    return 0;
+   if(item != NULL) {
+      printf("Element found: %d\n", item->data);
+   } else {
+      printf("Element not found\n");
+   }
 }
